@@ -2,6 +2,8 @@ from django.db import models
 
 from django.contrib.auth.models import AbstractUser
 
+from django.core.validators import RegexValidator
+
 ROLE_CHOICES = (
                ('User', 'Пользователь'),
                ('Moderator', 'Модератор'),
@@ -9,9 +11,14 @@ ROLE_CHOICES = (
 )
 
 
-class User(AbstractUser):
-    username = models.CharField(max_length=150, unique=True,
-                                verbose_name='Имя пользователя')
+class Users(AbstractUser):
+    username = models.CharField(
+        max_length=150, unique=True,
+        verbose_name='Имя пользователя',
+        validators=[RegexValidator(regex=r'^[\w.@+-]+\z',
+                    message=('Имя пользователя должно содержать только'
+                             'буквы, цифры или @/./+/-/_ '))]
+    )
     email = models.EmailField(max_length=254, unique=True,
                               verbose_name='Электронная почта')
     first_name = models.CharField(max_length=150, blank=True,
@@ -24,23 +31,3 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-
-
-class Titles(models.Model):
-    title = models.CharField(max_length=150)
-
-
-class Categories(models.Model):
-    title = models.CharField(max_length=150)
-
-
-class Genres(models.Model):
-    title = models.CharField(max_length=150)
-
-
-class Reviews(models.Model):
-    title = models.CharField(max_length=150)
-
-
-class Comments(models.Model):
-    title = models.CharField(max_length=150)
