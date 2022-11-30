@@ -5,7 +5,8 @@ from reviews.models import Users
 
 
 class UsersSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(
+    username = serializers.RegexField(
+        regex=r'^[\w.@+-]+\Z',
         required=True,
         validators=[UniqueValidator(queryset=Users.objects.all())]
     )
