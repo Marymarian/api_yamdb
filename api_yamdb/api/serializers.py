@@ -19,8 +19,8 @@ class UsersSerializer(serializers.ModelSerializer):
                   'last_name', 'bio', 'role')
         model = Users
 
-    def username_not_me(self, value):
-        if value['username'] == 'me':
+    def validate_username(self, value):
+        if value == 'me':
             raise serializers.ValidationError(
                 'Нельзя использовать "me" в качестве имени пользователя'
             )
