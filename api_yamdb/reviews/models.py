@@ -14,9 +14,5 @@ class Users(AbstractUser):
     role = models.CharField(choices=ROLE_CHOICES, max_length=16,
                             default='User', verbose_name='Роль')
 
-    def user_is_staff(self):
-        if self.role == 'Admin':
-            return self.is_staff
-
     def __str__(self):
         return self.username
