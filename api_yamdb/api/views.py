@@ -18,7 +18,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     """
     queryset = Titles.objects.all().annotate(
         Avg('reviews__score')).order_by('name')
-    #permission_classes = (IsAdminOrReadOnly, )
+    #permission_classes = ()
     serializer_class = TitlesSerializer
     filterset_class = TitlesFilter
 
@@ -28,7 +28,7 @@ class CategoriesViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
                       mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
-    #permission_classes = (IsAdminOrReadOnly, )
+    #permission_classes = ()
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ('name',)
 
@@ -37,6 +37,6 @@ class GenresViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
                    mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
-    #permission_classes = (IsAdminOrReadOnly, )
+    #permission_classes = ()
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ('name',)
