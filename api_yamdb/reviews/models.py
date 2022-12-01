@@ -3,6 +3,22 @@ from .validators import validate_for_year
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+ROLE_CHOICES = (
+               ('User', 'Пользователь'),
+               ('Moderator', 'Модератор'),
+               ('Admin', 'Администратор'),
+)
+
+
+class Users(AbstractUser):
+    """Кастомная модель пользователя."""
+    bio = models.TextField(blank=True, verbose_name='О себе')
+    role = models.CharField(choices=ROLE_CHOICES, max_length=16,
+                            default='User', verbose_name='Роль')
+
+    def __str__(self):
+        return self.username
+
 
 class Categories(models.Model):
     """Категории произведений.Произведению может быть присвоена одна категория."""
