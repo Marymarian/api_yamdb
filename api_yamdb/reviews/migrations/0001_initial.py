@@ -2,8 +2,10 @@
 
 import django.contrib.auth.models
 import django.core.validators
-from django.db import migrations, models
 import django.utils.timezone
+from django.db import migrations, models
+import django.db.models.deletion
+import reviews.validators
 
 
 class Migration(migrations.Migration):
@@ -42,5 +44,66 @@ class Migration(migrations.Migration):
             managers=[
                 ('objects', django.contrib.auth.models.UserManager()),
             ],
+            name='Affiliation',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+            ],
+            options={
+                'verbose_name': 'Произведение и его жанр',
+                'verbose_name_plural': 'Произведения и их жанры',
+            },
+        ),
+        migrations.CreateModel(
+            name='Categories',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=256, verbose_name='Название категории')),
+                ('slug', models.SlugField(unique=True, verbose_name='Уникальный id')),
+            ],
+            options={
+                'verbose_name': 'Категория',
+                'verbose_name_plural': 'Категории',
+                'ordering': ('name',),
+            },
+        ),
+        migrations.CreateModel(
+            name='Genres',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=256, verbose_name='Название жанра')),
+                ('slug', models.SlugField(unique=True, verbose_name='Уникальный id')),
+            ],
+            options={
+                'verbose_name': 'Жанр',
+                'verbose_name_plural': 'Жанры',
+                'ordering': ('name',),
+            },
+        ),
+        migrations.CreateModel(
+            name='Titles',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=256, verbose_name='Название произведения')),
+                ('year', models.IntegerField(validators=[reviews.validators.validate_for_year], verbose_name='Дата выхода')),
+                ('description', models.TextField(blank=True, null=True, verbose_name='Описание')),
+                ('rating', models.IntegerField(default=None, null=True, verbose_name='Рейтинг')),
+                ('category', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='titles', to='reviews.Categories', verbose_name='Категория')),
+                ('genre', models.ManyToManyField(related_name='titles', through='reviews.Affiliation', to='reviews.Genres', verbose_name='Жанр')),
+            ],
+            options={
+                'verbose_name': 'Произведение',
+                'verbose_name_plural': 'Произведения',
+                'ordering': ('name',),
+            },
+        ),
+        migrations.AddField(
+            model_name='affiliation',
+            name='genre',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='reviews.Genres', verbose_name='Жанр'),
+        ),
+        migrations.AddField(
+            model_name='affiliation',
+            name='title',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='reviews.Titles', verbose_name='Произведение'),
         ),
     ]

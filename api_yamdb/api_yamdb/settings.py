@@ -23,8 +23,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api.apps.ApiConfig',
-    'reviews.apps.ReviewsConfig',
+    'rest_framework',
+    'django_filters',
+    'reviews',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -127,3 +129,5 @@ SIMPLE_JWT = {
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
