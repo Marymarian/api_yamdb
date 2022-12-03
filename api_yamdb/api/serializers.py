@@ -98,6 +98,9 @@ class GenresSerializer(serializers.ModelSerializer):
 
 class TitlesSerializerGet(TitlesSerializer):
     """Отдельная сериализация для метода GET."""
+    rating = serializers.IntegerField(
+        source='reviews__score__avg', read_only=True
+    )
     category = CategoriesSerializer()
     genre = GenresSerializer(many=True, read_only=True)
 
