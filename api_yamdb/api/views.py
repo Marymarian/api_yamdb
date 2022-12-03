@@ -5,11 +5,11 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Categories, Genres, Reviews, Titles, Users
+from reviews.models import Categories, Genres, Review, Title, Users
 from .serializers import (
     UsersSerializer, SignUpSerializer, GetTokenSerializer,
-    CategoriesSerializer, GenresSerializer, TitlesSerializer,
-    CommentSerializer, ReviewSerializer)
+    CategoriesSerializer, GenresSerializer, TitlesSerializer, 
+    CommentSerializer, ReviewSerializer, TitlesSerializerGet)
 from .permissions import IsAdmin, IsAdminOrReadOnly, IsAdminAuthorOrReadOnly
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
@@ -95,11 +95,23 @@ class TitlesViewSet(viewsets.ModelViewSet):
     С помощью аннотации добавляем поле рейтинга к каждому объекту модели.
     Метод Avg (среднее арифметическое).
     """
-    queryset = Titles.objects.all().annotate(
+    queryset = Title.objects.all().annotate(
         Avg('reviews__score')).order_by('name')
-    permission_classes = (IsAdminOrReadOnly, )
     serializer_class = TitlesSerializer
+    permission_classes = (IsAdminOrReadOnly, )
+    filter_backends = (DjangoFilterBackend, )
     filterset_class = TitlesFilter
+    
+    def get_serializer_class(self):
+        """
+        Для разного типа запросов необходимо представить данные в разном виде,
+        для этого определяем для метода GET отдельный класс сериализации,
+        наследованный от основного.
+        """
+        if self.request.method == 'GET':
+            return TitlesSerializerGet
+        else:
+            return TitlesSerializer
 
 
 class CategoriesViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
@@ -109,6 +121,7 @@ class CategoriesViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
     permission_classes = (IsAdminOrReadOnly, )
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ('name',)
+    lookup_field = "slug"
 
 
 class GenresViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
@@ -118,6 +131,7 @@ class GenresViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
     permission_classes = (IsAdminOrReadOnly, )
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ('name',)
+    lookup_field = "slug"
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -125,13 +139,13 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminAuthorOrReadOnly, )
 
     def get_queryset(self):
-        title = get_object_or_404(Titles, pk=self.kwargs.get("title_id"))
+        title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
 
         return title.reviews.all()
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Titles, id=title_id)
+        title = get_object_or_404(Title, id=title_id)
         serializer.save(author=self.request.user, title=title)
 
 
@@ -140,11 +154,11 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminAuthorOrReadOnly, )
 
     def get_queryset(self):
-        review = get_object_or_404(Reviews, pk=self.kwargs.get("review_id"))
+        review = get_object_or_404(Review, pk=self.kwargs.get("review_id"))
         return review.comments.all()
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
         review_id = self.kwargs.get('review_id')
-        review = get_object_or_404(Reviews, id=review_id, title=title_id)
+        review = get_object_or_404(Review, id=review_id, title=title_id)
         serializer.save(author=self.request.user, review=review)

@@ -69,7 +69,7 @@ class Genres(models.Model):
         return self.name
 
 
-class Titles(models.Model):
+class Title(models.Model):
     """Произведения, к которым пишут отзывы."""
     name = models.CharField(
         verbose_name='Название произведения',
@@ -115,7 +115,7 @@ class Titles(models.Model):
 class Affiliation(models.Model):
     """Принадлежность произведений к жанрам."""
     title = models.ForeignKey(
-        Titles,
+        Title,
         verbose_name='Произведение',
         on_delete=models.CASCADE)
     genre = models.ForeignKey(
@@ -131,9 +131,9 @@ class Affiliation(models.Model):
         return f'{self.title} принадлежит жанру {self.genre}'
 
 
-class Reviews(models.Model):
+class Review(models.Model):
     title = models.ForeignKey(
-        Titles,
+        Title,
         verbose_name='Произведение',
         on_delete=models.CASCADE,
         related_name='reviews'
@@ -174,7 +174,7 @@ class Reviews(models.Model):
 
 class Comments(models.Model):
     review = models.ForeignKey(
-        Reviews,
+        Review,
         verbose_name='Отзыв',
         on_delete=models.CASCADE,
         related_name='comments'

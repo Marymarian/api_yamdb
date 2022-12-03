@@ -1,5 +1,5 @@
 import django_filters
-from reviews.models import Titles
+from reviews.models import Title
 
 
 class TitlesFilter(django_filters.FilterSet):
@@ -13,5 +13,5 @@ class TitlesFilter(django_filters.FilterSet):
         lookup_expr='icontains')  # частичный поиск
 
     class Meta:
-        model = Titles
+        model = Title
         fields = ('genre', 'category', 'year', 'name', )
