@@ -1,2 +1,2 @@
 # api_yamdb
-api_yamdb1
+api_yamdb
