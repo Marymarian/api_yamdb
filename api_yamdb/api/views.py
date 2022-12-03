@@ -8,7 +8,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Categories, Genres, Review, Title, Users
 from .serializers import (
     UsersSerializer, SignUpSerializer, GetTokenSerializer,
-    CategoriesSerializer, GenresSerializer, TitlesSerializer, 
+    CategoriesSerializer, GenresSerializer, TitlesSerializer,
     CommentSerializer, ReviewSerializer, TitlesSerializerGet)
 from .permissions import IsAdmin, IsAdminOrReadOnly, IsAdminAuthorOrReadOnly
 from django.core.mail import send_mail
@@ -101,7 +101,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly, )
     filter_backends = (DjangoFilterBackend, )
     filterset_class = TitlesFilter
-    
+
     def get_serializer_class(self):
         """
         Для разного типа запросов необходимо представить данные в разном виде,
