@@ -1,11 +1,15 @@
-from rest_framework import viewsets, status, permissions, filters, serializers, mixins
+from rest_framework import (viewsets, status, permissions,
+                            filters, serializers, mixins)
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Categories, Comments, Genres, Reviews, Titles, Users
-from .serializers import UsersSerializer, SignUpSerializer, GetTokenSerializer, CategoriesSerializer, GenresSerializer, TitlesSerializer, CommentSerializer, ReviewSerializer
+from reviews.models import Categories, Genres, Reviews, Titles, Users
+from .serializers import (
+    UsersSerializer, SignUpSerializer, GetTokenSerializer,
+    CategoriesSerializer, GenresSerializer, TitlesSerializer,
+    CommentSerializer, ReviewSerializer)
 from .permissions import IsAdmin, IsAdminOrReadOnly, IsAdminAuthorOrReadOnly
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
@@ -17,6 +21,9 @@ from .filters import TitlesFilter
 
 
 class UsersViewSet(viewsets.ModelViewSet):
+    """Администратор получает список пользователей, может создавать
+    пользователя. Пользователь по url 'users/me/' может получать и изменять
+     свои данные, кроме поля 'Роль'"""
     queryset = Users.objects.all()
     serializer_class = UsersSerializer
     permission_classes = (IsAdmin, )
@@ -44,6 +51,10 @@ class UsersViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def signup(request):
+    """
+    Пользователь отправляет свои 'username' и 'email' на 'auth/signup/ и
+    получает код подтверждения на email
+    """
     serializer = SignUpSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     username = serializer.validated_data['username']
@@ -64,14 +75,16 @@ def signup(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_token(request):
+    """
+    Пользователь отправляет свои 'username' и 'confirmation_code'
+    на 'auth/token/ и получает токен
+    """
     serializer = GetTokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     username = serializer.validated_data['username']
     confirmation_code = serializer.validated_data['confirmation_code']
     user = get_object_or_404(Users, username=username)
-    if default_token_generator. check_token(
-        user, confirmation_code
-    ):
+    if default_token_generator. check_token(user, confirmation_code):
         token = str(AccessToken.for_user(user))
         return Response({'token': token}, status=status.HTTP_200_OK)
     raise serializers.ValidationError('Введен неверный код')
@@ -79,7 +92,7 @@ def get_token(request):
 
 class TitlesViewSet(viewsets.ModelViewSet):
     """
-    С помощью аннотации добавляем поле рейтинга к каждому объекту модели. 
+    С помощью аннотации добавляем поле рейтинга к каждому объекту модели.
     Метод Avg (среднее арифметическое).
     """
     queryset = Titles.objects.all().annotate(
@@ -90,7 +103,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
 
 
 class CategoriesViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
-                      mixins.ListModelMixin, viewsets.GenericViewSet):
+                        mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
     permission_classes = (IsAdminOrReadOnly, )
@@ -99,7 +112,7 @@ class CategoriesViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
 
 
 class GenresViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
-                   mixins.ListModelMixin, viewsets.GenericViewSet):
+                    mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
     permission_classes = (IsAdminOrReadOnly, )
@@ -118,7 +131,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Title, id=title_id)
+        title = get_object_or_404(Titles, id=title_id)
         serializer.save(author=self.request.user, title=title)
 
 

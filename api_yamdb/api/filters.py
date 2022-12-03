@@ -8,9 +8,9 @@ class TitlesFilter(django_filters.FilterSet):
     category = django_filters.CharFilter(field_name='category',
                                          lookup_expr='slug')
     year = django_filters.NumberFilter(field_name='year')
-    name = django_filters.CharFilter(field_name='name',
-                                     lookup_expr='icontains') 
-                                     # частичный поиск
+    name = django_filters.CharFilter(
+        field_name='name',
+        lookup_expr='icontains')  # частичный поиск
 
     class Meta:
         model = Titles

@@ -4,7 +4,9 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from reviews.models import Categories, Comments, Genres, Reviews, Titles, Users
 
+
 class UsersSerializer(serializers.ModelSerializer):
+    """Сериализация объектов типа Users."""
     username = serializers.RegexField(
         regex=r'^[\w.@+-]+\Z',
         required=True,
@@ -29,6 +31,7 @@ class UsersSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
+    """Сериализация объектов типа Users при регистрации."""
     username = serializers.RegexField(
         regex=r'^[\w.@+-]+\Z',
         required=True,
@@ -40,7 +43,7 @@ class SignUpSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        Model = Users
+        model = Users
         fields = ('email', 'username')
 
     def validate_username(self, value):
@@ -50,12 +53,9 @@ class SignUpSerializer(serializers.ModelSerializer):
             )
         return value
 
-    class Meta:
-        fields = ('username', 'email')
-        model = Users
-
 
 class GetTokenSerializer(serializers.Serializer):
+    """Сериализация объектов типа Users при получении токена."""
     username = serializers.CharField()
     confirmation_code = serializers.CharField()
 

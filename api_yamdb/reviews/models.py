@@ -4,9 +4,9 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 ROLE_CHOICES = (
-               ('User', 'Пользователь'),
-               ('Moderator', 'Модератор'),
-               ('Admin', 'Администратор'),
+               ('user', 'Пользователь'),
+               ('moderator', 'Модератор'),
+               ('admin', 'Администратор'),
 )
 
 
@@ -14,14 +14,19 @@ class Users(AbstractUser):
     """Кастомная модель пользователя."""
     bio = models.TextField(blank=True, verbose_name='О себе')
     role = models.CharField(choices=ROLE_CHOICES, max_length=16,
-                            default='User', verbose_name='Роль')
+                            default='user', verbose_name='Роль')
 
     def __str__(self):
         return self.username
 
+    class Meta:
+        ordering = ['id']
+
 
 class Categories(models.Model):
-    """Категории произведений.Произведению может быть присвоена одна категория."""
+    """
+    Категории произведений.Произведению может быть присвоена одна категория.
+    """
     name = models.CharField(
         verbose_name='Название категории',
         max_length=256
@@ -42,7 +47,9 @@ class Categories(models.Model):
 
 
 class Genres(models.Model):
-    """Жанры произведений.Произведению может быть присвоено несколько жанров."""
+    """
+    Жанры произведений.Произведению может быть присвоено несколько жанров.
+    """
     name = models.CharField(
         verbose_name='Название жанра',
         max_length=256
@@ -122,7 +129,7 @@ class Affiliation(models.Model):
 
     def __str__(self):
         return f'{self.title} принадлежит жанру {self.genre}'
-        
+
 
 class Reviews(models.Model):
     title = models.ForeignKey(
