@@ -24,7 +24,7 @@ from api_yamdb.settings import DOMAIN_NAME
 class UsersViewSet(viewsets.ModelViewSet):
     """Администратор получает список пользователей, может создавать
     пользователя. Пользователь по url 'users/me/' может получать и изменять
-     свои данные, кроме поля 'Роль'"""
+     свои данные, кроме поля 'Роль'."""
     queryset = Users.objects.all()
     serializer_class = UsersSerializer
     permission_classes = (IsAdmin, )
@@ -33,7 +33,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     pagination_class = PageNumberPagination
 
-    @action(methods=['get', 'patch'], detail=False, url_path='me',
+    @action(methods=('get', 'patch',), detail=False, url_path='me',
             permission_classes=(permissions.IsAuthenticated,))
     def user_own_account(self, request):
         user = request.user
@@ -52,7 +52,7 @@ class UsersViewSet(viewsets.ModelViewSet):
 def signup(request):
     """
     Пользователь отправляет свои 'username' и 'email' на 'auth/signup/ и
-    получает код подтверждения на email
+    получает код подтверждения на email.
     """
     serializer = SignUpSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -76,7 +76,7 @@ def signup(request):
 def get_token(request):
     """
     Пользователь отправляет свои 'username' и 'confirmation_code'
-    на 'auth/token/ и получает токен
+    на 'auth/token/ и получает токен.
     """
     serializer = GetTokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -86,7 +86,7 @@ def get_token(request):
     if default_token_generator. check_token(user, confirmation_code):
         token = str(AccessToken.for_user(user))
         return Response({'token': token}, status=status.HTTP_200_OK)
-    raise serializers.ValidationError('Введен неверный код')
+    raise serializers.ValidationError('Введен неверный код.')
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
@@ -114,31 +114,33 @@ class TitlesViewSet(viewsets.ModelViewSet):
 
 class CategoriesViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
                         mixins.ListModelMixin, viewsets.GenericViewSet):
+    """Класс взаимодействия с моделью Categories."""
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
     permission_classes = (IsAdminOrReadOnly, )
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ('name',)
-    lookup_field = "slug"
+    lookup_field = 'slug'
 
 
 class GenresViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
                     mixins.ListModelMixin, viewsets.GenericViewSet):
+    """Класс взаимодействия с моделью Genres."""
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
     permission_classes = (IsAdminOrReadOnly, )
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ('name',)
-    lookup_field = "slug"
+    lookup_field = 'slug'
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """Класс взаимодействия с моделью Review."""
     serializer_class = ReviewSerializer
     permission_classes = (IsAdminAuthorOrReadOnly, )
 
     def get_queryset(self):
-        title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
-
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         return title.reviews.all()
 
     def perform_create(self, serializer):
@@ -148,11 +150,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """Класс взаимодействия с моделью Comment."""
     serializer_class = CommentSerializer
     permission_classes = (IsAdminAuthorOrReadOnly, )
 
     def get_queryset(self):
-        review = get_object_or_404(Review, pk=self.kwargs.get("review_id"))
+        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         return review.comments.all()
 
     def perform_create(self, serializer):

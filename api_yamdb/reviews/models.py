@@ -31,7 +31,7 @@ class Users(AbstractUser):
         return self.role == 'moderator'
 
     class Meta:
-        ordering = ['id']
+        ordering = ('id',)
 
 
 class Categories(models.Model):
@@ -143,6 +143,7 @@ class Affiliation(models.Model):
 
 
 class Review(models.Model):
+    """Отзывы на произведения. Отзыв привязан к определённому произведению."""
     title = models.ForeignKey(
         Title,
         verbose_name='Произведение',
@@ -172,18 +173,19 @@ class Review(models.Model):
     )
 
     class Meta:
+        ordering = ('pub_date',)
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-        ordering = ['pub_date']
-        constraints = [
+        constraints = (
             models.UniqueConstraint(
-                fields=['title', 'author'],
+                fields=('title', 'author',),
                 name='unique_review'
             ),
-        ]
+        )
 
 
 class Comments(models.Model):
+    """Комментарии к отзывам. Комментарий привязан к определённому отзыву."""
     review = models.ForeignKey(
         Review,
         verbose_name='Отзыв',
@@ -206,6 +208,6 @@ class Comments(models.Model):
     )
 
     class Meta:
+        ordering = ('pub_date',)
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-        ordering = ['pub_date']
