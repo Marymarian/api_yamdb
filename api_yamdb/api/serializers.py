@@ -27,6 +27,15 @@ class UsersSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Нельзя использовать "me" в качестве имени пользователя'
             )
+        if Users.objects.filter(username=value).exists():
+            return serializers.ValidationError(
+                'Данное имя пользователя уже существует')
+        return value
+
+    def validate_email(self, value):
+        if Users.objects.filter(email=value).exists():
+            return serializers.ValidationError(
+                'Данный Email уже зарегистрирован')
         return value
 
 
@@ -51,6 +60,15 @@ class SignUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Нельзя использовать "me" в качестве имени пользователя'
             )
+        if Users.objects.filter(username=value).exists():
+            return serializers.ValidationError(
+                'Данное имя пользователя уже существует')
+        return value
+
+    def validate_email(self, value):
+        if Users.objects.filter(email=value).exists():
+            return serializers.ValidationError(
+                'Данный Email уже зарегистрирован')
         return value
 
 
