@@ -110,8 +110,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
         """
         if self.request.method == 'GET':
             return TitlesSerializerGet
-        else:
-            return TitlesSerializer
+        return TitlesSerializer
 
 
 class CategoriesViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,

@@ -88,7 +88,7 @@ class Title(models.Model):
         related_name='titles',
         through='Affiliation'
     )
-    year = models.IntegerField(
+    year = models.PositiveIntegerField(
         verbose_name='Дата выхода',
         validators=[validate_for_year]
     )
@@ -97,7 +97,7 @@ class Title(models.Model):
         null=True,
         blank=True
     )
-    rating = models.IntegerField(
+    rating = models.PositiveIntegerField(
         verbose_name='Рейтинг',
         null=True,
         default=None

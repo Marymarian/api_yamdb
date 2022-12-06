@@ -6,6 +6,6 @@ def validate_for_year(value):
     """Дата выхода не может быть позднее текущего года."""
     if value > timezone.now().year:
         raise ValidationError(
-            ('%(value)s год позднее текущего года!'),
+            (f'{value} позднее текущего года!'),
             params={'value': value},
         )
