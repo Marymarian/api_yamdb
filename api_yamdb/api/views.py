@@ -18,6 +18,7 @@ from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from .filters import TitlesFilter
+from api_yamdb.settings import DOMAIN_NAME
 
 
 class UsersViewSet(viewsets.ModelViewSet):
@@ -36,15 +37,13 @@ class UsersViewSet(viewsets.ModelViewSet):
             permission_classes=(permissions.IsAuthenticated,))
     def user_own_account(self, request):
         user = request.user
-        if request.method == 'PATCH':
-            serializer = self.get_serializer(user, data=request.data,
-                                             partial=True)
-            if serializer.is_valid():
-                serializer.save(role=user.role, partial=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-        serializer = UsersSerializer(user)
+        if request.method == 'GET':
+            serializer = self.get_serializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = self.get_serializer(user, data=request.data,
+                                         partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(role=user.role, partial=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -65,7 +64,7 @@ def signup(request):
     send_mail(
         'Код подтверждения',
         f'Ваш код подтверждения: {confirmation_code}',
-        'noreply@yamdb.com',
+        DOMAIN_NAME,
         [user.email],
         fail_silently=False,
     )
@@ -110,8 +109,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
         """
         if self.request.method == 'GET':
             return TitlesSerializerGet
-        else:
-            return TitlesSerializer
+        return TitlesSerializer
 
 
 class CategoriesViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,

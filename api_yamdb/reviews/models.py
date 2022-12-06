@@ -19,6 +19,17 @@ class Users(AbstractUser):
     def __str__(self):
         return self.username
 
+    @property
+    def is_admin(self):
+        return (
+            self.role == 'admin'
+            or self.is_superuser
+        )
+
+    @property
+    def is_moderator(self):
+        return self.role == 'moderator'
+
     class Meta:
         ordering = ['id']
 
@@ -88,7 +99,7 @@ class Title(models.Model):
         related_name='titles',
         through='Affiliation'
     )
-    year = models.IntegerField(
+    year = models.PositiveIntegerField(
         verbose_name='Дата выхода',
         validators=[validate_for_year]
     )
@@ -97,7 +108,7 @@ class Title(models.Model):
         null=True,
         blank=True
     )
-    rating = models.IntegerField(
+    rating = models.PositiveIntegerField(
         verbose_name='Рейтинг',
         null=True,
         default=None
