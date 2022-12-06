@@ -142,20 +142,35 @@ class Affiliation(models.Model):
         return f'{self.title} принадлежит жанру {self.genre}'
 
 
-class Review(models.Model):
-    """Отзывы на произведения. Отзыв привязан к определённому произведению."""
-    title = models.ForeignKey(
-        Title,
-        verbose_name='Произведение',
-        on_delete=models.CASCADE,
-        related_name='reviews'
-    )
+
+class CommentsReview(models.Model):
     text = models.TextField(
         verbose_name='Текст',
     )
     author = models.ForeignKey(
         Users,
+        on_delete=models.CASCADE,
+    )
+    pub_date = models.DateTimeField(
+        verbose_name='Дата публикации',
+        auto_now_add=True,
+        db_index=True
+    )
+    author = models.ForeignKey(
+        Users,
         verbose_name='Автор',
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )    
+
+    class Meta:
+        abstract = True
+    
+class Review(CommentsReview):
+    """Отзывы на произведения. Отзыв привязан к определённому произведению."""
+    title = models.ForeignKey(
+        Title,
+        verbose_name='Произведение',
         on_delete=models.CASCADE,
         related_name='reviews'
     )
@@ -165,11 +180,6 @@ class Review(models.Model):
             MinValueValidator(1, 'Допустимы значения от 1 до 10'),
             MaxValueValidator(10, 'Допустимы значения от 1 до 10')
         ]
-    )
-    pub_date = models.DateTimeField(
-        verbose_name='Дата публикации',
-        auto_now_add=True,
-        db_index=True
     )
 
     class Meta:
@@ -184,27 +194,12 @@ class Review(models.Model):
         )
 
 
-class Comments(models.Model):
+class Comments(CommentsReview):
     """Комментарии к отзывам. Комментарий привязан к определённому отзыву."""
     review = models.ForeignKey(
         Review,
-        verbose_name='Отзыв',
         on_delete=models.CASCADE,
-        related_name='comments'
-    )
-    text = models.TextField(
-        verbose_name='Текст',
-    )
-    author = models.ForeignKey(
-        Users,
-        verbose_name='Пользователь',
-        on_delete=models.CASCADE,
-        related_name='comments'
-    )
-    pub_date = models.DateTimeField(
-        verbose_name='Дата публикации',
-        auto_now_add=True,
-        db_index=True
+        related_name="comments"
     )
 
     class Meta:
