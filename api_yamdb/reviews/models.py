@@ -142,7 +142,6 @@ class Affiliation(models.Model):
         return f'{self.title} принадлежит жанру {self.genre}'
 
 
-
 class CommentsReview(models.Model):
     text = models.TextField(
         verbose_name='Текст',
@@ -160,11 +159,12 @@ class CommentsReview(models.Model):
         Users,
         verbose_name='Автор',
         on_delete=models.CASCADE,
-    )    
+    )
 
     class Meta:
         abstract = True
-    
+
+
 class Review(CommentsReview):
     """Отзывы на произведения. Отзыв привязан к определённому произведению."""
     title = models.ForeignKey(
