@@ -160,7 +160,6 @@ class CommentsReview(models.Model):
         Users,
         verbose_name='Автор',
         on_delete=models.CASCADE,
-        related_name='reviews'
     )    
 
     class Meta:
