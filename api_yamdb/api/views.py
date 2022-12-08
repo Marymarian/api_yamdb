@@ -15,6 +15,7 @@ from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg
+from django.db import IntegrityError
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from .filters import TitlesFilter
@@ -58,17 +59,22 @@ def signup(request):
     serializer.is_valid(raise_exception=True)
     username = serializer.validated_data['username']
     email = serializer.validated_data['email']
-    user, created = Users.objects.get_or_create(username=username,
-                                                email=email)
-    confirmation_code = default_token_generator.make_token(user)
-    send_mail(
-        'Код подтверждения',
-        f'Ваш код подтверждения: {confirmation_code}',
-        DOMAIN_NAME,
-        [user.email],
-        fail_silently=False,
-    )
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    try:
+        user, created = Users.objects.get_or_create(username=username,
+                                                    email=email)
+        confirmation_code = default_token_generator.make_token(user)
+        send_mail(
+            'Код подтверждения',
+            f'Ваш код подтверждения: {confirmation_code}',
+            DOMAIN_NAME,
+            [user.email],
+            fail_silently=False,
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except IntegrityError:
+        raise serializers.ValidationError(
+            'Данные имя пользователя или Email уже зарегистрированы'
+        )
 
 
 @api_view(['POST'])

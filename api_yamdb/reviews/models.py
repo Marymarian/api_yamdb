@@ -12,6 +12,10 @@ ROLE_CHOICES = (
 
 class Users(AbstractUser):
     """Кастомная модель пользователя."""
+    username = models.CharField(blank=False, max_length=150,
+                                unique=True)
+    email = models.EmailField(blank=False, max_length=254,
+                              unique=True)
     bio = models.TextField(blank=True, verbose_name='О себе')
     role = models.CharField(choices=ROLE_CHOICES, max_length=16,
                             default='user', verbose_name='Роль')
@@ -34,50 +38,42 @@ class Users(AbstractUser):
         ordering = ('id',)
 
 
-class Categories(models.Model):
+class BaseModel(models.Model):
+    """Абстрактная модель для наследования"""
+    name = models.CharField(
+        verbose_name='Название',
+        max_length=256
+    )
+    slug = models.SlugField(
+        verbose_name='Уникальный id',
+        max_length=50,
+        unique=True
+    )
+
+    class Meta:
+        abstract = True
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+
+class Categories(BaseModel):
     """
     Категории произведений.Произведению может быть присвоена одна категория.
     """
-    name = models.CharField(
-        verbose_name='Название категории',
-        max_length=256
-    )
-    slug = models.SlugField(
-        verbose_name='Уникальный id',
-        max_length=50,
-        unique=True
-    )
-
-    class Meta:
-        ordering = ('name',)
+    class Meta(BaseModel.Meta):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
-    def __str__(self):
-        return self.name
 
-
-class Genres(models.Model):
+class Genres(BaseModel):
     """
     Жанры произведений.Произведению может быть присвоено несколько жанров.
     """
-    name = models.CharField(
-        verbose_name='Название жанра',
-        max_length=256
-    )
-    slug = models.SlugField(
-        verbose_name='Уникальный id',
-        max_length=50,
-        unique=True
-    )
-
-    class Meta:
-        ordering = ('name',)
+    class Meta(BaseModel.Meta):
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
-
-    def __str__(self):
-        return self.name
 
 
 class Title(models.Model):
